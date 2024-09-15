@@ -78,5 +78,3 @@ By contributing to this repository, you agree that your contributions are licens
 ## Acknowledgments
 
 We extend our gratitude to all the contributors and community members who have supported the development of this specification. Your expertise and dedication are invaluable.
-
-[![W3C Community](https://www.w3.org/Icons/w3c_home)](https://www.w3.org/community/nostr/) [![GitHub](https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png)](https://github.com/nostrcg/http-schnorr-auth)
