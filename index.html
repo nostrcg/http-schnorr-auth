@@ -198,6 +198,10 @@
               <code>["payload", "&lt;sha256-hex&gt;"]</code> (optional): SHA-256
               hash of the request body for methods like POST, PUT, PATCH.
             </li>
+            <li>
+              <code>["webid", "&lt;webid&gt;"]</code> (optional): The WebID of the client, allowing the event to carry user identification via WebID.
+            </li>
+            
           </ul>
         </li>
         <li>
@@ -277,6 +281,12 @@
           <code>["payload", "&lt;sha256-hex&gt;"]</code> tag, the SHA-256 hash
           of the request body MUST match the provided hash.
         </li>
+        <li>
+          <strong>WebID Validation</strong> (optional): If the event includes a 
+          <code>["webid", "&lt;webid&gt;"]</code> tag, the server MAY validate 
+          the WebID according to its own authentication policies.
+        </li>
+
       </ol>
       <p>
         If any of these checks fail, the server SHOULD respond with
