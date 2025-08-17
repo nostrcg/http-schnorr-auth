@@ -20,7 +20,21 @@
         inlineCSS: true,
         lint: true,
         github: 'https://github.com/nostrcg/http-schnorr-auth/',
-        maxTocLevel: 3
+        maxTocLevel: 3,
+        localBiblio: {
+          "NIP01": {
+            title: "Basic protocol flow description",
+            href: "https://github.com/nostr-protocol/nips/blob/master/01.md",
+            publisher: "Nostr Implementation Possibilities"
+          },
+          "BIP340": {
+            title: "Schnorr Signatures for secp256k1",
+            href: "https://github.com/bitcoin/bips/blob/master/bip-0340.mediawiki",
+            authors: ["Pieter Wuille", "Jonas Nick", "Tim Ruffing"],
+            date: "January 2020",
+            publisher: "Bitcoin Improvement Proposal 340"
+          }
+        }
       }
     </script>
     <script src="https://www.w3.org/Tools/respec/respec-w3c"></script>
@@ -406,23 +420,6 @@
           (HTTP/1.1): Authentication", RFC 7235, June 2014.
           <a href="https://www.rfc-editor.org/rfc/rfc7235"
             >https://www.rfc-editor.org/rfc/rfc7235</a
-          >
-        </dd>
-        
-        <dt>[NIP01]</dt>
-        <dd>
-          "Basic protocol flow description", Nostr Implementation Possibilities.
-          <a href="https://github.com/nostr-protocol/nips/blob/master/01.md"
-            >https://github.com/nostr-protocol/nips/blob/master/01.md</a
-          >
-        </dd>
-        
-        <dt>[BIP340]</dt>
-        <dd>
-          Pieter Wuille, Jonas Nick, Tim Ruffing, "Schnorr Signatures for secp256k1", 
-          Bitcoin Improvement Proposal 340, January 2020.
-          <a href="https://github.com/bitcoin/bips/blob/master/bip-0340.mediawiki"
-            >https://github.com/bitcoin/bips/blob/master/bip-0340.mediawiki</a
           >
         </dd>
         
