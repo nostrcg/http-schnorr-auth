@@ -493,10 +493,10 @@ tag-element    = url-tag / method-tag / payload-tag / webid-tag
 @prefix foaf: &lt;http://xmlns.com/foaf/0.1/&gt; .
 
 &lt;https://alice.example/profile#me&gt; a foaf:Person ;
-    nostr:publicKey "63fe6318dc58583cfe16810f86dd09e18bfd76aabc24a0081ce2856f330504ed" ;
+    nostr:pubkey "63fe6318dc58583cfe16810f86dd09e18bfd76aabc24a0081ce2856f330504ed" ;
     cert:key [
         a cert:PublicKey ;
-        nostr:secp256k1PublicKey "63fe6318dc58583cfe16810f86dd09e18bfd76aabc24a0081ce2856f330504ed" ;
+        nostr:pubkey "63fe6318dc58583cfe16810f86dd09e18bfd76aabc24a0081ce2856f330504ed" ;
         cert:exponent 65537 ;
         cert:modulus "abc123..."^^xsd:hexBinary
     ] .
