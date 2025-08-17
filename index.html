@@ -40,6 +40,12 @@
             authors: ["D. Crocker", "P. Overell"],
             date: "January 2008",
             publisher: "RFC 5234"
+          },
+          "DID-NOSTR": {
+            title: "DID Method Specification for Nostr",
+            href: "https://nostrcg.github.io/did-nostr/",
+            authors: ["Melvin Carvalho"],
+            publisher: "W3C Nostr Community Group"
           }
         }
       }
@@ -449,8 +455,9 @@ tag-element    = url-tag / method-tag / payload-tag / webid-tag
         </li>
         <li>
           <strong>WebID Validation</strong> (optional): If the event includes a 
-          <code>["webid", "&lt;webid&gt;"]</code> tag, the server MAY validate 
-          the WebID according to its own authentication policies.
+          <code>["webid", "&lt;identity-uri&gt;"]</code> tag, the server MAY perform
+          identity-based validation as specified in the 
+          <a href="#identity-integration">Identity Integration</a> section.
         </li>
 
       </ol>
@@ -464,6 +471,97 @@ tag-element    = url-tag / method-tag / payload-tag / webid-tag
         Servers MAY perform additional implementation-specific validation
         checks, such as rate limiting or public key blacklisting.
       </p>
+    </section>
+
+    <section id="identity-integration">
+      <h2>Identity Integration</h2>
+      <p>
+        This specification supports integration with decentralized identity systems
+        to enable automatic public key discovery and identity verification through
+        WebID profiles and DID:nostr identifiers.
+      </p>
+
+      <h3 id="webid-integration">WebID Profile Integration</h3>
+      <p>
+        WebID profiles MUST link to secp256k1 public keys to enable automatic
+        key discovery. The profile SHOULD include the public key using the 
+        following RDF vocabulary:
+      </p>
+      <pre><code>
+@prefix cert: &lt;http://www.w3.org/ns/auth/cert#&gt; .
+@prefix nostr: &lt;https://w3id.org/nostr/vocab#&gt; .
+@prefix foaf: &lt;http://xmlns.com/foaf/0.1/&gt; .
+
+&lt;https://alice.example/profile#me&gt; a foaf:Person ;
+    nostr:publicKey "63fe6318dc58583cfe16810f86dd09e18bfd76aabc24a0081ce2856f330504ed" ;
+    cert:key [
+        a cert:PublicKey ;
+        nostr:secp256k1PublicKey "63fe6318dc58583cfe16810f86dd09e18bfd76aabc24a0081ce2856f330504ed" ;
+        cert:exponent 65537 ;
+        cert:modulus "abc123..."^^xsd:hexBinary
+    ] .
+      </code></pre>
+
+      <h3 id="did-nostr-integration">DID:nostr Integration</h3>
+      <p>
+        This specification aligns with the DID:nostr method as specified in
+        [[DID-NOSTR]]. DID:nostr identifiers encode the public key directly
+        and provide a standardized resolution mechanism:
+      </p>
+      <pre><code>
+did:nostr:npub1v0lxx8xtp4vzlet3sgm3xmgne8x0majkys9qpq7v2pt0xvcq2nx4svlx5kj
+      </code></pre>
+      <p>
+        The public key can be extracted from the DID identifier using the
+        bech32 decoding process specified in the DID:nostr method.
+      </p>
+
+      <h3 id="identity-discovery-flow">Identity Discovery Flow</h3>
+      <p>
+        When a <code>webid</code> tag is present in the authentication event,
+        servers MAY perform identity-based validation:
+      </p>
+      <ol>
+        <li>Extract the identity URI from the <code>["webid", "&lt;identity-uri&gt;"]</code> tag</li>
+        <li>Resolve the identity document:
+          <ul>
+            <li>For <code>https://</code> URIs: Fetch WebID profile and parse RDF</li>
+            <li>For <code>did:nostr:</code> URIs: Extract public key from DID identifier</li>
+          </ul>
+        </li>
+        <li>Extract the linked secp256k1 public key from the identity document</li>
+        <li>Verify that the discovered public key matches the <code>pubkey</code> field in the event</li>
+        <li>Perform standard signature verification using the discovered key</li>
+        <li>Apply any additional identity-specific authorization policies</li>
+      </ol>
+
+      <h3 id="enhanced-webid-validation">Enhanced WebID Validation</h3>
+      <p>
+        When performing WebID-based validation, servers SHOULD implement
+        the following requirements:
+      </p>
+      <ul>
+        <li>
+          <strong>Key Consistency</strong>: The public key in the WebID profile
+          MUST match the <code>pubkey</code> field in the authentication event
+        </li>
+        <li>
+          <strong>Profile Caching</strong>: Servers MAY cache WebID profiles
+          for reasonable periods (e.g., 1 hour) to improve performance
+        </li>
+        <li>
+          <strong>HTTPS Requirement</strong>: WebID profiles MUST be served
+          over HTTPS with valid TLS certificates
+        </li>
+        <li>
+          <strong>Content Type Validation</strong>: WebID profiles MUST be
+          served with appropriate RDF content types (turtle, RDF/XML, JSON-LD)
+        </li>
+        <li>
+          <strong>Error Handling</strong>: If WebID resolution fails, servers
+          SHOULD fall back to standard public key validation without identity verification
+        </li>
+      </ul>
     </section>
 
     <section id="security-considerations">
