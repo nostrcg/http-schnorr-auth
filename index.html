@@ -33,6 +33,13 @@
             authors: ["Pieter Wuille", "Jonas Nick", "Tim Ruffing"],
             date: "January 2020",
             publisher: "Bitcoin Improvement Proposal 340"
+          },
+          "RFC5234": {
+            title: "Augmented BNF for Syntax Specifications: ABNF",
+            href: "https://www.rfc-editor.org/rfc/rfc5234",
+            authors: ["D. Crocker", "P. Overell"],
+            date: "January 2008",
+            publisher: "RFC 5234"
           }
         }
       }
@@ -53,7 +60,7 @@
         This specification defines a method for authenticating HTTP requests
         using Schnorr signatures, providing a decentralized and secure
         authentication mechanism. By leveraging Schnorr signatures, widely used
-        in cryptocurrencies like Bitcoin and Litecoin, this method enables
+        in Bitcoin Taproot and the Nostr protocol, this method enables
         seamless integration with decentralized networks and services.
       </p>
     </section>
@@ -191,7 +198,12 @@
       <img src="sequence.png" alt="Protocol Sequence Diagram" />
 
       <h3 id="event-structure">Event Structure</h3>
-      <p>The event is a JSON object with the following fields:</p>
+      <p>
+        The event is a JSON object with the following fields. The complete JSON structure 
+        is defined in the <a href="#json-event-structure">ABNF grammar section</a>, and 
+        individual field formats are specified in the 
+        <a href="#event-field-formats">Event Field Formats</a>.
+      </p>
       <ul>
         <li><code>id</code>: The hash of the serialized event.</li>
         <li>
@@ -300,6 +312,87 @@
       </ol>
     </section>
 
+    <section id="abnf-grammar">
+      <h2>ABNF Grammar</h2>
+      <p>
+        This section provides formal syntax definitions using Augmented Backus-Naur Form (ABNF) 
+        as specified in [[RFC5234]]. These grammar rules define the precise format requirements 
+        for all protocol elements.
+      </p>
+
+      <h3 id="authorization-header-abnf">Authorization Header</h3>
+      <pre><code>
+nostr-auth     = "Authorization:" OWS "Nostr" 1*SP b64token OWS
+b64token       = 1*( ALPHA / DIGIT / "+" / "/" ) *2"="
+      </code></pre>
+
+      <h3 id="event-field-formats">Event Field Formats</h3>
+      <pre><code>
+event-id       = 64HEXDIG
+public-key     = 64HEXDIG
+signature      = 128HEXDIG
+unix-timestamp = 1*DIGIT
+kind-value     = "27235"
+content-field  = ""
+      </code></pre>
+
+      <h3 id="tag-formats">Tag Formats</h3>
+      <pre><code>
+url-tag        = "[" DQUOTE "u" DQUOTE "," OWS DQUOTE absolute-URI DQUOTE "]"
+method-tag     = "[" DQUOTE "method" DQUOTE "," OWS DQUOTE http-method DQUOTE "]"
+payload-tag    = "[" DQUOTE "payload" DQUOTE "," OWS DQUOTE 64HEXDIG DQUOTE "]"
+webid-tag      = "[" DQUOTE "webid" DQUOTE "," OWS DQUOTE absolute-URI DQUOTE "]"
+      </code></pre>
+
+      <h3 id="base-definitions">Base Definitions</h3>
+      <pre><code>
+http-method    = "GET" / "POST" / "PUT" / "DELETE" / "PATCH" / "HEAD" / "OPTIONS"
+absolute-URI   = scheme ":" hier-part [ "?" query ] [ "#" fragment ]
+scheme         = ALPHA *( ALPHA / DIGIT / "+" / "-" / "." )
+hier-part      = "//" authority path-absolute / path-absolute / path-rootless / path-empty
+authority      = [ userinfo "@" ] host [ ":" port ]
+path-absolute  = "/" [ segment-nz *( "/" segment ) ]
+query          = *( pchar / "/" / "?" )
+fragment       = *( pchar / "/" / "?" )
+HEXDIG         = DIGIT / "A" / "B" / "C" / "D" / "E" / "F" / "a" / "b" / "c" / "d" / "e" / "f"
+64HEXDIG       = 64HEXDIG-rule
+64HEXDIG-rule  = HEXDIG HEXDIG HEXDIG HEXDIG HEXDIG HEXDIG HEXDIG HEXDIG
+                 HEXDIG HEXDIG HEXDIG HEXDIG HEXDIG HEXDIG HEXDIG HEXDIG
+                 HEXDIG HEXDIG HEXDIG HEXDIG HEXDIG HEXDIG HEXDIG HEXDIG
+                 HEXDIG HEXDIG HEXDIG HEXDIG HEXDIG HEXDIG HEXDIG HEXDIG
+                 HEXDIG HEXDIG HEXDIG HEXDIG HEXDIG HEXDIG HEXDIG HEXDIG
+                 HEXDIG HEXDIG HEXDIG HEXDIG HEXDIG HEXDIG HEXDIG HEXDIG
+                 HEXDIG HEXDIG HEXDIG HEXDIG HEXDIG HEXDIG HEXDIG HEXDIG
+                 HEXDIG HEXDIG HEXDIG HEXDIG HEXDIG HEXDIG HEXDIG HEXDIG
+128HEXDIG      = 128HEXDIG-rule
+128HEXDIG-rule = 64HEXDIG-rule 64HEXDIG-rule
+
+; Core ABNF rules from RFC 5234
+ALPHA          = %x41-5A / %x61-7A   ; A-Z / a-z
+DIGIT          = %x30-39             ; 0-9
+DQUOTE         = %x22                ; " (Double Quote)
+SP             = %x20                ; space
+OWS            = *( SP / HTAB )      ; optional whitespace
+HTAB           = %x09                ; horizontal tab
+      </code></pre>
+
+      <h3 id="json-event-structure">JSON Event Structure</h3>
+      <pre><code>
+event-object   = "{" 
+                   DQUOTE "id" DQUOTE ":" DQUOTE event-id DQUOTE ","
+                   DQUOTE "pubkey" DQUOTE ":" DQUOTE public-key DQUOTE ","
+                   DQUOTE "created_at" DQUOTE ":" unix-timestamp ","
+                   DQUOTE "kind" DQUOTE ":" kind-value ","
+                   DQUOTE "tags" DQUOTE ":" tags-array ","
+                   DQUOTE "content" DQUOTE ":" DQUOTE content-field DQUOTE ","
+                   DQUOTE "sig" DQUOTE ":" DQUOTE signature DQUOTE
+                 "}"
+
+tags-array     = "[" [ tag-element *( "," tag-element ) ] "]"
+tag-element    = url-tag / method-tag / payload-tag / webid-tag
+      </code></pre>
+    </section>
+
     <section id="http-authorization-header">
       <h2>HTTP Authorization Header</h2>
       <p>
@@ -309,6 +402,10 @@
       </p>
 
       <h3 id="header-format">Header Format</h3>
+      <p>
+        The Authorization header MUST conform to the 
+        <a href="#authorization-header-abnf">ABNF grammar definition</a>.
+      </p>
       <pre><code>Authorization: Nostr &lt;base64-encoded-event&gt;</code></pre>
 
       <h3 id="example">Example</h3>
