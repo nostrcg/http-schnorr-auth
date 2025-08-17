@@ -219,6 +219,50 @@
         </li>
       </ul>
 
+      <h3 id="event-serialization">Event Serialization</h3>
+      <p>
+        Events MUST be serialized according to the canonical JSON format specified in 
+        [[NIP-01]]. The serialization process is as follows:
+      </p>
+      <ol>
+        <li>Create a JSON array containing exactly these elements in order:
+          <ul>
+            <li><code>0</code> (integer, always zero)</li>
+            <li><code>pubkey</code> (string, lowercase hexadecimal)</li>
+            <li><code>created_at</code> (integer, UNIX timestamp)</li>
+            <li><code>kind</code> (integer, must be 27235)</li>
+            <li><code>tags</code> (array of arrays, sorted lexicographically)</li>
+            <li><code>content</code> (string, should be empty)</li>
+          </ul>
+        </li>
+        <li>Serialize the array to JSON with no extra whitespace</li>
+        <li>Encode the resulting string as UTF-8 bytes</li>
+      </ol>
+      
+      <h3 id="event-id-calculation">Event ID Calculation</h3>
+      <p>
+        The <code>id</code> field MUST be calculated as follows:
+      </p>
+      <ol>
+        <li>Serialize the event as specified in the 
+          <a href="#event-serialization">Event Serialization</a> section</li>
+        <li>Compute the SHA-256 hash of the serialized UTF-8 bytes</li>
+        <li>Encode the hash as a lowercase hexadecimal string</li>
+      </ol>
+      
+      <h3 id="signature-creation">Signature Creation</h3>
+      <p>
+        The <code>sig</code> field MUST be created as follows:
+      </p>
+      <ol>
+        <li>Calculate the event ID as specified in the 
+          <a href="#event-id-calculation">Event ID Calculation</a> section</li>
+        <li>Convert the hexadecimal event ID to 32 bytes</li>
+        <li>Sign the 32-byte hash using the secp256k1 Schnorr signature algorithm 
+          as specified in [[BIP-340]]</li>
+        <li>Encode the 64-byte signature as a lowercase hexadecimal string</li>
+      </ol>
+
       <h3 id="authentication-flow">Authentication Flow</h3>
       <ol>
         <li>
@@ -282,8 +326,9 @@
         </li>
         <li>
           <strong>Signature Verification</strong>: The <code>sig</code> field
-          MUST be a valid Schnorr signature of the serialized event, verifiable
-          using the <code>pubkey</code>.
+          MUST be a valid secp256k1 Schnorr signature as specified in [[BIP-340]], 
+          verifiable using the <code>pubkey</code> and the event ID calculated 
+          according to the <a href="#event-id-calculation">Event ID Calculation</a> section.
         </li>
         <li>
           <strong>Payload Hash Check</strong> (optional): If the request
@@ -361,6 +406,32 @@
           (HTTP/1.1): Authentication", RFC 7235, June 2014.
           <a href="https://www.rfc-editor.org/rfc/rfc7235"
             >https://www.rfc-editor.org/rfc/rfc7235</a
+          >
+        </dd>
+        
+        <dt>[NIP-01]</dt>
+        <dd>
+          "Basic protocol flow description", Nostr Implementation Possibilities.
+          <a href="https://github.com/nostr-protocol/nips/blob/master/01.md"
+            >https://github.com/nostr-protocol/nips/blob/master/01.md</a
+          >
+        </dd>
+        
+        <dt>[BIP-340]</dt>
+        <dd>
+          Pieter Wuille, Jonas Nick, Tim Ruffing, "Schnorr Signatures for secp256k1", 
+          Bitcoin Improvement Proposal 340, January 2020.
+          <a href="https://github.com/bitcoin/bips/blob/master/bip-0340.mediawiki"
+            >https://github.com/bitcoin/bips/blob/master/bip-0340.mediawiki</a
+          >
+        </dd>
+        
+        <dt>[RFC6234]</dt>
+        <dd>
+          Eastlake 3rd, D. and T. Hansen, "US Secure Hash Algorithms (SHA and SHA-based HMAC and HKDF)", 
+          RFC 6234, May 2011.
+          <a href="https://www.rfc-editor.org/rfc/rfc6234"
+            >https://www.rfc-editor.org/rfc/rfc6234</a
           >
         </dd>
       </dl>
