@@ -1,0 +1,298 @@
+{
+  "title": "HTTP Schnorr Auth Test Vectors",
+  "description": "Test vectors for NIP-98/HTTP Schnorr Auth implementations",
+  "version": "0.0.1",
+  "generated_at": "2026-01-11T22:37:04.731Z",
+  "test_keys": {
+    "private_key_hex": "e8f32e723decf4051aefac8e2c93c9c5b214313817cdb01a1494b917c8436b35",
+    "public_key_hex": "39a36013301597daef41fbe593a02cc513d0b55527ec2df1050e2e8ff49c85c2",
+    "warning": "TEST KEY ONLY - never use in production"
+  },
+  "vectors": [
+    {
+      "id": "valid-get-request",
+      "description": "Valid GET request authentication event",
+      "expected": "ACCEPT",
+      "event": {
+        "pubkey": "39a36013301597daef41fbe593a02cc513d0b55527ec2df1050e2e8ff49c85c2",
+        "created_at": 1768171024,
+        "kind": 27235,
+        "tags": [
+          [
+            "u",
+            "https://example.com/resource"
+          ],
+          [
+            "method",
+            "GET"
+          ]
+        ],
+        "content": "",
+        "id": "c49639cd7a19aef38849cbd36ea3a453e2a9291313d40febf11b83019ee104b2",
+        "sig": "c3539724403625e791aafe30377b24cc0a2db167df2068e648deace0f40bea9c83724803cd8db57eec80c6202701d3cd9820804960cfa40cafec0bc7faf2fa00"
+      },
+      "request": {
+        "url": "https://example.com/resource",
+        "method": "GET"
+      }
+    },
+    {
+      "id": "valid-post-with-payload",
+      "description": "Valid POST request with payload hash",
+      "expected": "ACCEPT",
+      "event": {
+        "pubkey": "39a36013301597daef41fbe593a02cc513d0b55527ec2df1050e2e8ff49c85c2",
+        "created_at": 1768171024,
+        "kind": 27235,
+        "tags": [
+          [
+            "u",
+            "https://example.com/api/data"
+          ],
+          [
+            "method",
+            "POST"
+          ],
+          [
+            "payload",
+            "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad"
+          ]
+        ],
+        "content": "",
+        "id": "e3cb89453ed69ccdca370384ee1bdc0d4c5b0a6a19649f54eb219305311d38d2",
+        "sig": "2d68739f4efab28ad9b53491f6e821be0d0bb28729740fce5ac40c3d743b94918ca51d48e0ec44c2d832bf0ae98ba493359b70b6d0342e707c1831689d14e7d4"
+      },
+      "request": {
+        "url": "https://example.com/api/data",
+        "method": "POST",
+        "body": "abc"
+      }
+    },
+    {
+      "id": "invalid-signature",
+      "description": "Event with corrupted signature",
+      "expected": "REJECT",
+      "expected_status": 401,
+      "event": {
+        "pubkey": "39a36013301597daef41fbe593a02cc513d0b55527ec2df1050e2e8ff49c85c2",
+        "created_at": 1768171024,
+        "kind": 27235,
+        "tags": [
+          [
+            "u",
+            "https://example.com/resource"
+          ],
+          [
+            "method",
+            "GET"
+          ]
+        ],
+        "content": "",
+        "id": "c49639cd7a19aef38849cbd36ea3a453e2a9291313d40febf11b83019ee104b2",
+        "sig": "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+      },
+      "request": {
+        "url": "https://example.com/resource",
+        "method": "GET"
+      }
+    },
+    {
+      "id": "wrong-kind",
+      "description": "Event with wrong kind (not 27235)",
+      "expected": "REJECT",
+      "expected_status": 401,
+      "event": {
+        "pubkey": "39a36013301597daef41fbe593a02cc513d0b55527ec2df1050e2e8ff49c85c2",
+        "created_at": 1768171024,
+        "kind": 1,
+        "tags": [
+          [
+            "u",
+            "https://example.com/resource"
+          ],
+          [
+            "method",
+            "GET"
+          ]
+        ],
+        "content": "",
+        "id": "a22054490cf1e092db1c2157ab279a9111a13d98a90cf40885342baa2dd707df",
+        "sig": "9481ee463bdd06665869658180793be1e08cd81bc1d1d9706d8cee5695d774560de3edc2201e8c1d9c5aea432cc446340f1c4606e0742c17fbb056bcf5bcd082"
+      },
+      "request": {
+        "url": "https://example.com/resource",
+        "method": "GET"
+      }
+    },
+    {
+      "id": "expired-event",
+      "description": "Event older than 60 seconds",
+      "expected": "REJECT",
+      "expected_status": 401,
+      "event": {
+        "pubkey": "39a36013301597daef41fbe593a02cc513d0b55527ec2df1050e2e8ff49c85c2",
+        "created_at": 1768167424,
+        "kind": 27235,
+        "tags": [
+          [
+            "u",
+            "https://example.com/resource"
+          ],
+          [
+            "method",
+            "GET"
+          ]
+        ],
+        "content": "",
+        "id": "f1e4a3e63bfbd9830ac259d273b75c94d71d6fd33bd163d0fc00f339a3aba99c",
+        "sig": "dab24e104555eb95a7dd80624a4cf319c51171a7005ca0c3a423f117f478941629d548bd43f5e1a64762ff897d5770c9f0c934b413a867e94f93fc6ec91ed1a8"
+      },
+      "request": {
+        "url": "https://example.com/resource",
+        "method": "GET"
+      }
+    },
+    {
+      "id": "url-mismatch",
+      "description": "URL in event doesn't match request URL",
+      "expected": "REJECT",
+      "expected_status": 401,
+      "event": {
+        "pubkey": "39a36013301597daef41fbe593a02cc513d0b55527ec2df1050e2e8ff49c85c2",
+        "created_at": 1768171024,
+        "kind": 27235,
+        "tags": [
+          [
+            "u",
+            "https://other-domain.com/resource"
+          ],
+          [
+            "method",
+            "GET"
+          ]
+        ],
+        "content": "",
+        "id": "8bb1ddadaf5f979b84b5aea871bae90c9e021c62b55ec2d032a9c2d0c4818e2a",
+        "sig": "7069383db45ac4183c9e23e10d0edf9530ce0ea3fd4b00d033c050651694f542e1ca5e2e0a382bf8479e1ff82642ded068813fd02fba1f822385117fd1628660"
+      },
+      "request": {
+        "url": "https://example.com/resource",
+        "method": "GET"
+      }
+    },
+    {
+      "id": "method-mismatch",
+      "description": "Method in event doesn't match request method",
+      "expected": "REJECT",
+      "expected_status": 401,
+      "event": {
+        "pubkey": "39a36013301597daef41fbe593a02cc513d0b55527ec2df1050e2e8ff49c85c2",
+        "created_at": 1768171024,
+        "kind": 27235,
+        "tags": [
+          [
+            "u",
+            "https://example.com/resource"
+          ],
+          [
+            "method",
+            "POST"
+          ]
+        ],
+        "content": "",
+        "id": "1b376e67af4cdf22e7679c5b7c83acde0ef0c72043dd13425b2e5a64098f5599",
+        "sig": "4572574b3d5d0634acdaf1f4bac488704e4ba2bd5eb9541c0e04864f6e9b92cecf4fea6bc4bcff11149652e6c6c6b4aa182212f27567b5a76568f49225135095"
+      },
+      "request": {
+        "url": "https://example.com/resource",
+        "method": "GET"
+      }
+    },
+    {
+      "id": "missing-url-tag",
+      "description": "Event missing required 'u' tag",
+      "expected": "REJECT",
+      "expected_status": 401,
+      "event": {
+        "pubkey": "39a36013301597daef41fbe593a02cc513d0b55527ec2df1050e2e8ff49c85c2",
+        "created_at": 1768171024,
+        "kind": 27235,
+        "tags": [
+          [
+            "method",
+            "GET"
+          ]
+        ],
+        "content": "",
+        "id": "dd7e569c6d436a47871c1845f4f33affff8ede2cd44035706531f9ba1585785d",
+        "sig": "d831b1514963bc679a8eacdde26e3f1caeff0d296b85ebd9de1115d4c962baa2716659966c9d84575ccdbdbf01ea371480081cdb1c468c32cd0ea155dbcffc09"
+      },
+      "request": {
+        "url": "https://example.com/resource",
+        "method": "GET"
+      }
+    },
+    {
+      "id": "missing-method-tag",
+      "description": "Event missing required 'method' tag",
+      "expected": "REJECT",
+      "expected_status": 401,
+      "event": {
+        "pubkey": "39a36013301597daef41fbe593a02cc513d0b55527ec2df1050e2e8ff49c85c2",
+        "created_at": 1768171024,
+        "kind": 27235,
+        "tags": [
+          [
+            "u",
+            "https://example.com/resource"
+          ]
+        ],
+        "content": "",
+        "id": "cec36c05264370aa0fa2049cc4da9f5e2c54dac3c262b27ef8032b655916771f",
+        "sig": "832d324d539069d718e2420d7afb6658d8cb90f8dcf21b6457b5ee69a9429652715c3631cee26da5ed95adad9a0e617720ed30762f93ad1b55518c5ac82de7ff"
+      },
+      "request": {
+        "url": "https://example.com/resource",
+        "method": "GET"
+      }
+    },
+    {
+      "id": "payload-hash-mismatch",
+      "description": "Payload hash doesn't match request body",
+      "expected": "REJECT",
+      "expected_status": 401,
+      "event": {
+        "pubkey": "39a36013301597daef41fbe593a02cc513d0b55527ec2df1050e2e8ff49c85c2",
+        "created_at": 1768171024,
+        "kind": 27235,
+        "tags": [
+          [
+            "u",
+            "https://example.com/api/data"
+          ],
+          [
+            "method",
+            "POST"
+          ],
+          [
+            "payload",
+            "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad"
+          ]
+        ],
+        "content": "",
+        "id": "e3cb89453ed69ccdca370384ee1bdc0d4c5b0a6a19649f54eb219305311d38d2",
+        "sig": "2d68739f4efab28ad9b53491f6e821be0d0bb28729740fce5ac40c3d743b94918ca51d48e0ec44c2d832bf0ae98ba493359b70b6d0342e707c1831689d14e7d4"
+      },
+      "request": {
+        "url": "https://example.com/api/data",
+        "method": "POST",
+        "body": "different content"
+      }
+    }
+  ],
+  "references": {
+    "nip98": "https://nips.nostr.com/98",
+    "nip01": "https://nips.nostr.com/1",
+    "bip340": "https://github.com/bitcoin/bips/blob/master/bip-0340.mediawiki"
+  }
+}
