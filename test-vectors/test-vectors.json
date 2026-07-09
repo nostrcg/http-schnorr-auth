@@ -1,4 +1,3 @@
-Test Public Key: 39a36013301597daef41fbe593a02cc513d0b55527ec2df1050e2e8ff49c85c2
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "HTTP Schnorr Auth Test Vectors",
